@@ -1,7 +1,8 @@
 import numpy as np
 from sentence_transformers import SentenceTransformer
 
-MODEL_PATH = "nomic-ai/nomic-embed-text-v1"
+# MODEL_PATH = "nomic-ai/nomic-embed-text-v1"
+MODEL_PATH = "sentence-transformers/all-MiniLM-L6-v2"
 
 
 class Embeddings:
@@ -9,11 +10,13 @@ class Embeddings:
         self.model = SentenceTransformer(MODEL_PATH, trust_remote_code=True)
 
     def compute_embedding(self, text_content: str):
-        return self.model.encode(f"classification: {text_content}")
+        payload = f"{text_content.strip('/wiki/')}"
+        return self.model.encode(payload)
 
     def compute_embeddings_for_nav_links(self, nav_links):
         links = list(nav_links.values())
-        embeddings = self.model.encode([f"classification: {link}" for link in links])
+        batch = [f"{link.strip('/wiki/')}" for link in links]
+        embeddings = self.model.encode(batch)
         embeddings_dict = {
             link: embedding for link, embedding in zip(links, embeddings)
         }
